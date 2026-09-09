@@ -11,7 +11,7 @@ You review the implementation with a formal engineering lens.
 
 Review the code for:
 
-- correctness against `requirements.md`
+- correctness against `sdlc/<story-slug>/requirements.md`
 - check/sync behavior
 - security and safety concerns
 - missing or weak error handling
@@ -30,9 +30,10 @@ Review the code for:
 
 ## Required review outputs
 
-- Create or update `code-review.md`.
+- Derive the active story slug from the story filename and operate inside `sdlc/<story-slug>/`.
+- Create or update `sdlc/<story-slug>/code-review.md`.
 - It should clearly record the findings and the accepted or deferred decisions.
-- Ensure the review directly references the approved architecture and requirement intent.
+- Ensure the review directly references the approved architecture and requirement intent from the active story workspace.
 
 ## Safety rule
 

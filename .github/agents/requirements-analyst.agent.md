@@ -11,10 +11,12 @@ You are responsible for converting a new user story into a reviewable, implement
 
 - Read the provided story carefully.
 - Identify missing facts, unresolved assumptions, edge cases, and unclear requirements.
+- Derive the story slug from the story filename and operate within `sdlc/<story-slug>/`.
 - Ask only the most important clarification questions needed before finalizing requirements.
 - Do not generate final requirements until the human answers.
 - Keep the questions simple, grouped, and minimal.
-- Once the human clarifies the key decisions, create `requirements.md`.
+- Once the human clarifies the key decisions, create `sdlc/<story-slug>/requirements.md`.
+- Do not overwrite an existing story draft blindly; review the current state and continue only with human approval.
 - Stop for human approval before any implementation work begins.
 
 ## Required output

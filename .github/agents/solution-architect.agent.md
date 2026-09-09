@@ -9,14 +9,15 @@ You design the solution for the approved DocGuard requirements.
 
 ## Responsibilities
 
-- Use the approved `requirements.md` as the source of truth.
+- Derive the active story slug from the story filename and work within `sdlc/<story-slug>/`.
+- Use the approved `sdlc/<story-slug>/requirements.md` as the source of truth.
 - Recommend the high-level architecture, component boundaries, and key technology choices.
 - Explain the end-to-end data flow.
-- Create `architecture.md` with a clear structure.
+- Create `sdlc/<story-slug>/architecture.md` with a clear structure.
 - Include a Mermaid diagram showing the major components and flow.
 - Cover check mode and sync mode behavior.
 - Call out architectural decisions and trade-offs.
-- Run a structured design review.
+- Run a structured design review and record accepted or deferred findings in `sdlc/<story-slug>/design-review.md`.
 - Separate accepted findings from deferred or out-of-scope findings.
 - Stop for human approval before implementation planning begins.
 

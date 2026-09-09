@@ -7,7 +7,13 @@ This repository implements DocGuard, a Java 17 Maven CLI that statically analyze
 ## Project rules
 
 - Use Java 17 and Maven conventions for all implementation work.
-- Treat `requirements.md` and `architecture.md` as the source of truth for scope and design.
+- For every new user story, derive a story slug from the story filename: `demo-story.md` -> `demo-story`.
+- Create and use the active story workspace at `sdlc/<story-slug>/` for every lifecycle artifact for that story.
+- Treat `sdlc/<story-slug>/requirements.md` and `sdlc/<story-slug>/architecture.md` as the source of truth for scope and design for the active story.
+- Historical root-level files such as `requirements.md`, `architecture.md`, `design-review.md`, `impl-plan.md`, `code-review.md`, `verification-report.md`, and `pull-request.md` are evidence from the original DocGuard v1 cycle and may be read for reference only; do not modify them during a new story cycle unless the human explicitly asks for it.
+- All specialist agents and reusable prompts must operate on the active story workspace instead of automatically targeting root-level artifacts.
+- Each lifecycle phase must consume the approved artifact from the same story workspace and follow the human approval gates before transitions.
+- If a story-specific artifact already exists, inspect its current state before making changes and do not overwrite it blindly; update only with human approval.
 - Do not start implementation until requirements and architecture are approved.
 - Preserve deterministic output expectations: endpoint ordering, formatting, and Markdown generation must be stable across repeated runs.
 - Keep `check` mode read-only and `sync` mode limited to the generated section only.
@@ -65,14 +71,18 @@ No major lifecycle transition, design finding implementation, or code fix should
 
 ## Repository artifact expectations
 
-- `requirements.md` captures approved functional and non-functional requirements.
-- `architecture.md` describes the high-level solution and technology decisions.
-- `design-review.md` records findings, severity, recommendations, and final agreed decisions.
-- `impl-plan.md` tracks dependency-ordered implementation tasks.
-- `code-review.md` records review findings and resolution status.
-- `verification-report.md` captures validation evidence and final status.
+For the active story, all lifecycle artifacts live under `sdlc/<story-slug>/`:
+
+- `sdlc/<story-slug>/requirements.md` captures approved functional and non-functional requirements.
+- `sdlc/<story-slug>/architecture.md` describes the high-level solution and technology decisions.
+- `sdlc/<story-slug>/design-review.md` records findings, severity, recommendations, and final agreed decisions.
+- `sdlc/<story-slug>/impl-plan.md` tracks dependency-ordered implementation tasks.
+- `sdlc/<story-slug>/code-review.md` records review findings and resolution status.
+- `sdlc/<story-slug>/verification-report.md` captures validation evidence and final status.
 - `README.md` remains the user-facing documentation for build, usage, safety behavior, and limitations.
-- `pull-request.md` is the final release summary for the approved delivery.
+- `sdlc/<story-slug>/pull-request.md` is the final release summary for the approved delivery.
+
+Root-level SDLC files remain historical evidence and are not the active story workspace unless the human explicitly requests otherwise.
 
 ## Testing expectations
 

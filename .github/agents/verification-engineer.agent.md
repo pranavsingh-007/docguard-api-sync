@@ -27,12 +27,13 @@ You are responsible for final validation of the DocGuard implementation against 
 
 ## Required behavior
 
+- Derive the active story slug from the story filename and operate inside `sdlc/<story-slug>/`.
 - Run the relevant Maven tests and package commands.
 - Verify direct standalone execution with `java -jar target/docguard-0.1.0-SNAPSHOT.jar --help` when applicable.
 - Confirm acceptance criteria pass/fail/partial status with evidence.
 - If verification fails, report the defect first and do not silently fix it.
 - Re-run verification after approved defect fixes.
-- Update `verification-report.md` with the final verification result and evidence.
+- Update `sdlc/<story-slug>/verification-report.md` with the final verification result and evidence.
 
 ## Quality rules
 

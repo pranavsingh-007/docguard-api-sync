@@ -8,22 +8,24 @@ This skill captures the reusable lifecycle used to deliver DocGuard and future s
 
 1. Story intake
    - Read the user story.
+   - Derive the story slug from the story filename (for example, `demo-story.md` -> `demo-story`).
+   - Create or use the active story workspace at `sdlc/<story-slug>/`.
    - Clarify missing requirements before any final specification work.
    - Stop for human approval.
 
 2. Requirements
-   - Produce `requirements.md` only after clarification.
+   - Produce `sdlc/<story-slug>/requirements.md` only after clarification.
    - Include functional requirements, non-functional requirements, assumptions, constraints, error handling, acceptance criteria, and out of scope.
    - Stop for human approval.
 
 3. Architecture
-   - Use the approved requirements.
-   - Produce `architecture.md` with component responsibilities, major decisions, and a Mermaid diagram.
-   - Run a structured design review and record accepted vs deferred decisions.
+   - Use the approved requirements from `sdlc/<story-slug>/requirements.md`.
+   - Produce `sdlc/<story-slug>/architecture.md` with component responsibilities, major decisions, and a Mermaid diagram.
+   - Run a structured design review and record accepted vs deferred decisions in `sdlc/<story-slug>/design-review.md`.
    - Stop for human approval.
 
 4. Implementation planning
-   - Produce `impl-plan.md` with dependency ordering.
+   - Produce `sdlc/<story-slug>/impl-plan.md` with dependency ordering.
    - Separate blocked tasks from immediate-start tasks.
    - Stop for human approval.
 
@@ -34,28 +36,37 @@ This skill captures the reusable lifecycle used to deliver DocGuard and future s
 
 6. Code review
    - Review against correctness, security, error handling, test coverage, clarity, DRY, and dependency safety.
-   - Report findings before changes are applied.
+   - Record findings in `sdlc/<story-slug>/code-review.md` before changes are applied.
    - Apply only explicitly approved fixes.
 
 7. Verification
    - Run tests, Maven package/build validation, and CLI verification.
    - Verify acceptance criteria and generated documentation quality.
+   - Record evidence in `sdlc/<story-slug>/verification-report.md`.
    - Report defects before code changes and re-run after approved fixes.
 
 8. Pull request preparation
-   - Produce a summary with Summary, Changes Made, Test Evidence, Known Limitations, Reviewer Checklist, Agentic SDLC Evidence, and Changelog.
+   - Produce a summary in `sdlc/<story-slug>/pull-request.md` with Summary, Changes Made, Test Evidence, Known Limitations, Reviewer Checklist, Agentic SDLC Evidence, and Changelog.
    - Stop for human approval.
+
+## Story isolation contract
+
+- Every new story is isolated in `sdlc/<story-slug>/`.
+- The active story workspace is the only place to create or update story artifacts.
+- Historical root-level SDLC files are reference evidence only and must not be modified during a new story cycle.
+- Each phase must read and write the approved artifact from the same story workspace.
+- If a story-specific artifact already exists, review it before updating and require explicit human approval before overwriting it.
 
 ## Artifact expectations
 
-- `requirements.md`: approved requirement set and scope
-- `architecture.md`: solution design and technology decisions
-- `design-review.md`: findings, severity, recommendations, accepted vs deferred decisions
-- `impl-plan.md`: dependency-ordered work plan
-- `code-review.md`: review findings and resolution status
-- `verification-report.md`: final verification evidence
+- `sdlc/<story-slug>/requirements.md`: approved requirement set and scope
+- `sdlc/<story-slug>/architecture.md`: solution design and technology decisions
+- `sdlc/<story-slug>/design-review.md`: findings, severity, recommendations, accepted vs deferred decisions
+- `sdlc/<story-slug>/impl-plan.md`: dependency-ordered work plan
+- `sdlc/<story-slug>/code-review.md`: review findings and resolution status
+- `sdlc/<story-slug>/verification-report.md`: final verification evidence
 - `README.md`: user-facing documentation and limitations
-- `pull-request.md`: final release summary
+- `sdlc/<story-slug>/pull-request.md`: final release summary
 
 ## Quality gates
 
