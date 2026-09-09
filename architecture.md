@@ -151,12 +151,14 @@ Key design rule:
 
 Responsibilities:
 - Ensure the source directory exists and is readable
-- Ensure the documentation file exists in check mode and is present in sync mode when required by policy
+- Require the documentation file to exist for `check` mode; for `sync` mode, fail with a clear error if the file is missing unless a future explicit initialization feature is added
 - Confirm generated markers are correctly formed before write operations
 - Validate arguments and fail fast with clear diagnostics
+- Validate source-file parseability before accepting input for a full run
 
 Key design rule:
 - Fail before mutation whenever the tool cannot safely process the inputs
+- In v1, `sync` is fail-closed: no auto-create or implicit file generation
 
 ### 4.3 Source Discovery
 
@@ -193,8 +195,32 @@ Responsibilities:
 
 Key design rule:
 - Normalize all endpoint data into a consistent model before generating docs or comparing values
+- v1 will support direct Spring annotation usage and will fail clearly on unsupported composed/inherited annotation patterns rather than silently skipping them
 
-### 4.6 Documentation Model Builder
+### 4.6 Canonical endpoint schema and ordering
+
+For v1, endpoint metadata shall be normalized to a single canonical model before Markdown generation or diffing. The canonical structure shall include at minimum:
+
+- `method`
+- `path`
+- `pathVariables[]`
+- `queryParams[]`
+- `requestBody`
+- `responseType`
+- `sourceClass`
+- `sourceMethod`
+- `diagnostics` (optional, for unresolved or ambiguous values)
+
+The canonical ordering rule for output shall be deterministic, using a stable sort order such as:
+
+1. controller class name
+2. full path
+3. HTTP method
+4. parameter names (for comparable items)
+
+This keeps generation and comparison deterministic across equivalent source trees.
+
+### 4.7 Documentation Model Builder
 
 Responsibilities:
 - Convert endpoint metadata into the representation to be rendered in Markdown
@@ -204,17 +230,18 @@ Responsibilities:
 Key design rule:
 - Do not generate Markdown directly from raw AST nodes; generate from normalized data structures
 
-### 4.7 Markdown Section Manager
+### 4.8 Markdown Section Manager
 
 Responsibilities:
 - Locate generated-section boundaries in the existing Markdown
 - Read and replace content between the markers without touching the rest of the file
 - Validate structural integrity of the document
+- Validate marker pairs strictly: missing start/end markers, duplicate markers, nested markers, and mismatched pairs must fail before any write occurs
 
 Key design rule:
 - The generated section is the only writable region in sync mode
 
-### 4.8 Drift Comparator
+### 4.9 Drift Comparator
 
 Responsibilities:
 - Compare generated endpoint model vs. existing generated endpoint model
@@ -225,25 +252,29 @@ Responsibilities:
 Key design rule:
 - The comparison engine should operate on normalized data, not on raw text where possible
 
-### 4.9 File Update and Persistence
+### 4.10 File Update and Persistence
 
 Responsibilities:
 - Replace the generated block atomically
 - Preserve exact manual content outside the section
 - Avoid partial writes and temporary corruption
+- Read and write Markdown files using UTF-8 without BOM
+- Normalize line endings to `\n` for comparison and generated output to keep diffs stable across platforms
 
 Key design rule:
 - Write to a temp file then replace the original using an atomic move when supported
 
-### 4.10 Reporting and Exit Code Layer
+### 4.11 Reporting and Exit Code Layer
 
 Responsibilities:
 - Print concise drift summaries for `check`
 - Print success or error status for `sync`
 - Return exit codes consistent with CI/CD expectations
+- Send normal status and summaries to stdout
+- Send errors, warnings, and malformed-file diagnostics to stderr
 
 Key design rule:
-- The process must be deterministic and script-friendly
+- The process must be deterministic, script-friendly, and consistent across local and CI execution
 
 ## 5. End-to-end data flow
 
@@ -251,39 +282,41 @@ Key design rule:
 
 1. User invokes CLI with `check` and required arguments.
 2. CLI parses inputs and validates the source directory and doc file.
-3. Source Discovery enumerates candidate Java files.
-4. Parser Adapter reads each candidate file and builds ASTs.
-5. Endpoint Extractor identifies controller classes and mapping annotations.
-6. Domain model is produced for each endpoint with normalized method/path/parameter metadata.
-7. Documentation Model Builder renders the canonical Markdown fragment.
-8. Markdown Section Manager reads the existing generated section from the documentation file.
-9. Drift Comparator compares the generated model with the existing generated section.
-10. Reporting layer prints differences and exits with a non-zero status if drift is detected.
+3. Configuration validation ensures the doc file exists for `check` and fails if it does not.
+4. Source Discovery enumerates candidate Java files.
+5. Parser Adapter reads each candidate file and builds ASTs. If any file fails to parse, the run fails fast and no mutation occurs.
+6. Endpoint Extractor identifies controller classes and mapping annotations.
+7. Domain model is produced for each endpoint using the canonical endpoint schema and stable sort order.
+8. Documentation Model Builder renders the canonical Markdown fragment.
+9. Markdown Section Manager reads the existing generated section from the documentation file.
+10. Drift Comparator compares the generated model with the existing generated section.
+11. Reporting layer prints differences and exits with a non-zero status if drift is detected.
 
 ### 5.2 Normal flow for sync mode
 
 1. User invokes CLI with `sync` and required arguments.
 2. CLI validates arguments and safety constraints.
-3. Source Discovery enumerates Java files.
-4. Parser Adapter builds ASTs for candidate controller files.
-5. Endpoint Extractor resolves all endpoints into normalized metadata.
-6. Documentation Model Builder creates the fresh Markdown section.
-7. Markdown Section Manager validates generated markers in the target file.
-8. File Update and Persistence replaces only the generated section with the new content.
-9. Reporting layer prints success/failure information and proper exit code.
+3. Configuration validation fails if the target documentation file is missing, because v1 does not auto-create the file.
+4. Source Discovery enumerates Java files.
+5. Parser Adapter builds ASTs for candidate controller files. Parse errors fail the run before any write happens.
+6. Endpoint Extractor resolves all endpoints into normalized metadata.
+7. Documentation Model Builder creates the fresh Markdown section using the canonical ordering and formatting contract.
+8. Markdown Section Manager validates the generated markers in the target file and fails if they are malformed or duplicated.
+9. File Update and Persistence replaces only the generated section with the new content in UTF-8 format while preserving manual content outside the markers.
+10. Reporting layer prints success/failure information and proper exit code.
 
 ### 5.3 Error flow
 
 Errors occur before mutation whenever possible:
 
 - missing source directory
+- missing documentation file in `sync` or `check`
 - invalid Java source file
 - malformed markers
-- missing documentation file in `check`
+- unreadable or non-UTF-8 files
 - permission failures
-- unreadable files or encoding issues
 
-These are handled by the validation layer and reporting layer, with the mutation layer protected by guard checks.
+These are handled by the validation layer and reporting layer, with the mutation layer protected by guard checks. In v1, the tool fails fast on parse or marker-validation issues and does not continue to a partial or speculative write.
 
 ## 6. Mermaid component and flow diagram
 
