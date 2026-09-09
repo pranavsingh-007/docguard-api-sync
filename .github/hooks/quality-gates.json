@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "hooks": [
+    {
+      "id": "docguard-mvn-test",
+      "name": "Maven test gate",
+      "description": "Run the repository test suite before finalizing changes in the implementation or verification phase.",
+      "when": [
+        "after:implementation",
+        "after:code-review",
+        "after:verification",
+        "before:pull-request"
+      ],
+      "command": "mvn test",
+      "cwd": ".",
+      "allowedExitCodes": [0],
+      "failOnOutputMatch": []
+    },
+    {
+      "id": "docguard-mvn-package",
+      "name": "Maven package gate",
+      "description": "Ensure the project packages successfully before release readiness is confirmed.",
+      "when": [
+        "after:verification",
+        "before:pull-request"
+      ],
+      "command": "mvn package",
+      "cwd": ".",
+      "allowedExitCodes": [0],
+      "failOnOutputMatch": []
+    },
+    {
+      "id": "docguard-direct-cli-check",
+      "name": "Direct CLI smoke gate",
+      "description": "Exercise the built JAR with the help command to confirm a runnable standalone CLI for final verification.",
+      "when": [
+        "after:verification",
+        "before:pull-request"
+      ],
+      "command": "java -jar target/docguard-0.1.0-SNAPSHOT.jar --help",
+      "cwd": ".",
+      "allowedExitCodes": [0],
+      "failOnOutputMatch": [
+        "NoClassDefFoundError",
+        "Exception in thread",
+        "Could not find or load main class"
+      ]
+    }
+  ]
+}
