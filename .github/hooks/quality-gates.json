@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "hooks": [
-    {
+  "hooks": {
+    "docguard-mvn-test": {
       "id": "docguard-mvn-test",
       "name": "Maven test gate",
       "description": "Run the repository test suite before finalizing changes in the implementation or verification phase.",
@@ -16,7 +16,7 @@
       "allowedExitCodes": [0],
       "failOnOutputMatch": []
     },
-    {
+    "docguard-mvn-package": {
       "id": "docguard-mvn-package",
       "name": "Maven package gate",
       "description": "Ensure the project packages successfully before release readiness is confirmed.",
@@ -29,7 +29,7 @@
       "allowedExitCodes": [0],
       "failOnOutputMatch": []
     },
-    {
+    "docguard-direct-cli-check": {
       "id": "docguard-direct-cli-check",
       "name": "Direct CLI smoke gate",
       "description": "Exercise the built JAR with the help command to confirm a runnable standalone CLI for final verification.",
@@ -46,5 +46,5 @@
         "Could not find or load main class"
       ]
     }
-  ]
+  }
 }

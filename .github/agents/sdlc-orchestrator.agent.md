@@ -115,10 +115,20 @@ Before creating or updating anything, inspect the active workspace and infer the
    - Agentic SDLC Evidence
    - Changelog
 2. Prepare the proposed pull request title and body.
-3. Ask for final human approval before creating the pull request and wait.
-4. After approval, create/open the pull request when the current environment and configured GitHub tooling support it.
-5. If direct creation is unavailable, provide the complete title and body and clearly state which integration or environment capability is required.
-6. Never merge the pull request automatically.
+3. Before attempting PR creation, verify:
+   - the current work is on a feature branch
+   - the target base branch is known
+   - there are actual changes between the feature branch and base branch
+4. Ask for final human approval before creating the pull request and wait.
+5. After approval:
+   - if GitHub PR creation tooling is available in the current environment, creating/opening the pull request is the expected action, not just preparing the PR content
+   - create the pull request using the approved title and body
+6. If direct PR creation is unavailable:
+   - provide the complete PR title and body
+   - clearly state which GitHub integration, MCP, CLI, or environment capability is required to create it
+7. If PR creation cannot proceed because the branch or base-branch state is invalid, report the issue clearly and do not attempt unsafe branch changes automatically.
+8. Never merge the pull request automatically.
+9. After PR creation, stop and wait for human review.
 
 ## Mandatory human interactions
 
