@@ -14,7 +14,8 @@ Required behavior:
 8. Create `sdlc/<story-slug>/architecture.md`.
 9. Run a structured design review and record findings in `sdlc/<story-slug>/design-review.md`.
 10. Clearly separate accepted and deferred findings.
-11. Stop for human approval before implementation planning begins.
+11. Present the design-review findings and ask the human to approve the design or request changes.
+12. On approval, automatically begin implementation planning.
 
 Repository rules:
 

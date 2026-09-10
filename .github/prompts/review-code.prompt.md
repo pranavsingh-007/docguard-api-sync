@@ -10,7 +10,9 @@ Required behavior:
 4. Record findings in `sdlc/<story-slug>/code-review.md` with severity, recommendation, and status.
 5. Apply only findings explicitly approved by the human.
 6. Keep the review aligned with the approved scope and architecture.
-7. Stop for human approval before implementation of fixes begins.
+7. If findings exist, ask which findings are approved for fixing and wait.
+8. If no findings exist, ask for approval to proceed to verification.
+9. After approved fixes or approval to proceed, begin verification automatically.
 
 Repository rules:
 

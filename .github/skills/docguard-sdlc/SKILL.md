@@ -2,86 +2,101 @@
 
 ## Purpose
 
-This skill captures the reusable lifecycle used to deliver DocGuard and future similar Java 17 Maven CLI features. It standardizes how a new story progresses from idea to implementation, review, verification, and pull request preparation.
+This skill defines a reusable, stateful, human-governed lifecycle for DocGuard stories. The SDLC Orchestrator owns the workflow after a developer supplies one story reference; the developer does not manually select phases or specialist agents.
+
+## Minimal entry point
+
+Use:
+
+`Start the SDLC flow for <story-reference>.`
+
+The story reference may be a local story file or, when configured tooling supports retrieval, an external issue identifier such as a Jira issue key.
+
+## Story intake and workspace resolution
+
+- Resolve and read the supplied story automatically.
+- Derive the story slug from the local filename without its final extension, or normalize an external issue identifier to lowercase.
+- Replace spaces and unsupported slug characters with single hyphens and trim leading/trailing hyphens.
+- Use `sdlc/<story-slug>/` as the active workspace without asking the human to specify it.
+- Inspect existing artifacts before acting. Resume from the earliest incomplete phase or pending approval gate.
+- File presence alone is not approval. If approval is uncertain, present the existing artifact for approval rather than overwriting it.
+- Root-level SDLC files are historical evidence only and must not be modified.
 
 ## Lifecycle
 
-1. Story intake
-   - Read the user story.
-   - Derive the story slug from the story filename (for example, `demo-story.md` -> `demo-story`).
-   - Create or use the active story workspace at `sdlc/<story-slug>/`.
-   - Clarify missing requirements before any final specification work.
-   - Stop for human approval.
+1. **Requirements**
+   - Automatically read and analyze the story.
+   - Ask only necessary clarification questions.
+   - Create or update `requirements.md` after clarification.
+   - Ask: **Approve and continue** or **Request changes**.
 
-2. Requirements
-   - Produce `sdlc/<story-slug>/requirements.md` only after clarification.
-   - Include functional requirements, non-functional requirements, assumptions, constraints, error handling, acceptance criteria, and out of scope.
-   - Stop for human approval.
+2. **Architecture and design review**
+   - Begin automatically after requirements approval.
+   - Create `architecture.md` and `design-review.md`.
+   - Present findings and ask for design approval or changes.
 
-3. Architecture
-   - Use the approved requirements from `sdlc/<story-slug>/requirements.md`.
-   - Produce `sdlc/<story-slug>/architecture.md` with component responsibilities, major decisions, and a Mermaid diagram.
-   - Run a structured design review and record accepted vs deferred decisions in `sdlc/<story-slug>/design-review.md`.
-   - Stop for human approval.
+3. **Implementation planning**
+   - Begin automatically after design approval.
+   - Create `impl-plan.md` with dependency-ordered, immediate, and blocked tasks.
+   - Ask for implementation approval or revisions.
+   - Do not change production code before approval.
 
-4. Implementation planning
-   - Produce `sdlc/<story-slug>/impl-plan.md` with dependency ordering.
-   - Separate blocked tasks from immediate-start tasks.
-   - Stop for human approval.
+4. **Implementation**
+   - Begin automatically after plan approval.
+   - Change production code and tests in normal repository locations.
+   - Run relevant tests automatically.
+   - Continue directly to code review when implementation completes.
 
-5. Implementation
-   - Implement only approved tasks.
-   - Use small batches and relevant tests after each batch.
-   - Stop at approval gates.
+5. **Code review and approved fixes**
+   - Review against the active requirements, architecture, design review, and plan.
+   - Create `code-review.md` before fixes.
+   - If findings exist, ask which findings may be fixed; apply only approved fixes.
+   - If no findings exist, ask for approval to proceed to verification.
 
-6. Code review
-   - Review against correctness, security, error handling, test coverage, clarity, DRY, and dependency safety.
-   - Record findings in `sdlc/<story-slug>/code-review.md` before changes are applied.
-   - Apply only explicitly approved fixes.
+6. **Verification and approved defect fixes**
+   - Run relevant unit tests, integration tests, Maven build/package, acceptance checks, and story-specific functional checks.
+   - Create `verification-report.md`.
+   - Report failures before changes and request fix approval.
+   - After approved fixes, rerun verification automatically.
+   - Continue only after PASS or explicit acceptance of a documented limitation.
 
-7. Verification
-   - Run tests, Maven package/build validation, and CLI verification.
-   - Verify acceptance criteria and generated documentation quality.
-   - Record evidence in `sdlc/<story-slug>/verification-report.md`.
-   - Report defects before code changes and re-run after approved fixes.
+7. **Pull request preparation**
+   - Create `pull-request.md` with Summary, Changes Made, Test Evidence, Known Limitations, Reviewer Checklist, Agentic SDLC Evidence, and Changelog.
+   - Prepare the PR title and body.
+   - Obtain final human approval.
+   - Create/open the PR when supported; otherwise provide the complete title/body and required integration guidance.
+   - Never merge automatically.
 
-8. Pull request preparation
-   - Produce a summary in `sdlc/<story-slug>/pull-request.md` with Summary, Changes Made, Test Evidence, Known Limitations, Reviewer Checklist, Agentic SDLC Evidence, and Changelog.
-   - Stop for human approval.
+## Automatic transition rule
 
-## Story isolation contract
+Approval at a lifecycle gate authorizes the orchestrator to start the next phase immediately. The human must not be asked to issue workflow-management prompts such as "continue to architecture," "start implementation planning," "perform code review," or "run verification."
 
-- Every new story is isolated in `sdlc/<story-slug>/`.
-- The active story workspace is the only place to create or update story artifacts.
-- Historical root-level SDLC files are reference evidence only and must not be modified during a new story cycle.
-- Each phase must read and write the approved artifact from the same story workspace.
-- If a story-specific artifact already exists, review it before updating and require explicit human approval before overwriting it.
+## Artifact contract
 
-## Artifact expectations
+- `sdlc/<story-slug>/requirements.md`
+- `sdlc/<story-slug>/architecture.md`
+- `sdlc/<story-slug>/design-review.md`
+- `sdlc/<story-slug>/impl-plan.md`
+- `sdlc/<story-slug>/code-review.md`
+- `sdlc/<story-slug>/verification-report.md`
+- `sdlc/<story-slug>/pull-request.md`
 
-- `sdlc/<story-slug>/requirements.md`: approved requirement set and scope
-- `sdlc/<story-slug>/architecture.md`: solution design and technology decisions
-- `sdlc/<story-slug>/design-review.md`: findings, severity, recommendations, accepted vs deferred decisions
-- `sdlc/<story-slug>/impl-plan.md`: dependency-ordered work plan
-- `sdlc/<story-slug>/code-review.md`: review findings and resolution status
-- `sdlc/<story-slug>/verification-report.md`: final verification evidence
-- `README.md`: user-facing documentation and limitations
-- `sdlc/<story-slug>/pull-request.md`: final release summary
+The story workspace contains SDLC evidence only. Production source, tests, and user documentation remain in their normal repository locations.
 
-## Quality gates
+## Mandatory human gates
 
-- No implementation without human approval.
-- No major revision without explicit human approval.
+- requirements clarifications and approval
+- design approval
+- implementation-plan approval
+- code-review finding approval, or approval to verify when there are no findings
+- verification defect-fix approval or limitation acceptance
+- final pull request approval
+
+## Quality rules
+
+- No production implementation before plan approval.
+- No review or verification fixes without explicit approval.
 - No silent feature expansion.
-- No rewriting of historical SDLC evidence files.
-- Deterministic output is required.
-- Safe file updates are mandatory.
-- Test coverage must cover happy paths and important failure cases.
-- Maven tests and build/package checks must pass before release signoff.
-
-## Handoff rules
-
-- Each phase must produce a reviewable artifact or explicit decision record.
-- The next phase must not begin until the prior artifact is approved.
-- Findings and defect reports are communicated before code changes are implemented.
-- The final release is evidence-driven and traceable to the approved requirements.
+- No blind overwrite of approved artifacts.
+- Deterministic output and safe file updates are mandatory.
+- Relevant tests and Maven package validation must pass before final signoff unless a limitation is explicitly accepted.

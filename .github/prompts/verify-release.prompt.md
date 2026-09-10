@@ -12,7 +12,11 @@ Required behavior:
 6. If validation fails, report defects before modifying code.
 7. Re-run verification after approved defect fixes.
 8. Update `sdlc/<story-slug>/verification-report.md` with final evidence.
-9. Stop for human approval before release signoff.
+9. If verification fails, ask which defect fixes are approved; after approved fixes, rerun verification automatically.
+10. Proceed only after PASS or explicit acceptance of a documented limitation.
+11. Create `sdlc/<story-slug>/pull-request.md`, prepare the PR title/body, and ask for final approval before PR creation.
+12. Create/open the PR after approval when supported; otherwise provide the complete title/body and required integration guidance.
+13. Never merge automatically.
 
 Repository rules:
 

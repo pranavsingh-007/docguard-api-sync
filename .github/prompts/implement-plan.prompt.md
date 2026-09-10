@@ -11,7 +11,9 @@ Required behavior:
 5. Clearly indicate immediate-start tasks and blocked tasks.
 6. Include testing tasks, CI/CD task, and documentation task.
 7. Create `sdlc/<story-slug>/impl-plan.md`.
-8. Stop for human approval before implementation starts.
+8. Ask the human to approve implementation or request revisions.
+9. Do not modify production code before approval.
+10. On approval, automatically begin implementation.
 
 Repository rules:
 
