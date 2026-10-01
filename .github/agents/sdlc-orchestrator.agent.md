@@ -128,6 +128,7 @@ Before creating or updating anything, inspect the active workspace and infer the
    - clearly state which GitHub integration, MCP, CLI, or environment capability is required to create it
 7. If PR creation cannot proceed because the branch or base-branch state is invalid, report the issue clearly and do not attempt unsafe branch changes automatically.
 8. Never merge the pull request automatically.
+
 9. After PR creation, stop and wait for human review.
 
 ## Mandatory human interactions
